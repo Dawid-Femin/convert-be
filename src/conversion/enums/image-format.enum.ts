@@ -13,6 +13,8 @@ export enum OutputFormat {
   JPEG = 'jpeg',
   PNG = 'png',
   WEBP = 'webp',
+  AVIF = 'avif',
+  TIFF = 'tiff',
 }
 
 export const INPUT_MIME_TYPES: Record<string, InputFormat> = {
