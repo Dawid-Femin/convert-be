@@ -26,7 +26,7 @@ export class ConversionController {
     };
   }
 
-  @Post()
+  @Post('convert')
   @UseInterceptors(FileInterceptor('file'))
   async convert(
     @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
