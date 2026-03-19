@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Res,
   UploadedFile,
@@ -10,11 +11,20 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { ConversionService } from './conversion.service';
 import { ConvertImageDto } from './dto/convert-image.dto';
+import { InputFormat, OutputFormat } from './enums/image-format.enum';
 import { FileValidationPipe } from './pipes/file-validation.pipe';
 
-@Controller('convert')
+@Controller()
 export class ConversionController {
   constructor(private readonly conversionService: ConversionService) {}
+
+  @Get('formats')
+  getFormats() {
+    return {
+      input: Object.values(InputFormat),
+      output: Object.values(OutputFormat),
+    };
+  }
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
