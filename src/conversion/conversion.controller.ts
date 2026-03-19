@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Post,
   Res,
   UploadedFile,
@@ -27,6 +28,7 @@ export class ConversionController {
   }
 
   @Post('convert')
+  @HttpCode(200)
   @UseInterceptors(FileInterceptor('file'))
   async convert(
     @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
