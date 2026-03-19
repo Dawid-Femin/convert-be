@@ -5,6 +5,8 @@ export enum InputFormat {
   GIF = 'gif',
   TIFF = 'tiff',
   BMP = 'bmp',
+  AVIF = 'avif',
+  SVG = 'svg',
 }
 
 export enum OutputFormat {
@@ -20,4 +22,6 @@ export const INPUT_MIME_TYPES: Record<string, InputFormat> = {
   'image/gif': InputFormat.GIF,
   'image/tiff': InputFormat.TIFF,
   'image/bmp': InputFormat.BMP,
+  'image/avif': InputFormat.AVIF,
+  'image/svg+xml': InputFormat.SVG,
 };
