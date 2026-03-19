@@ -48,6 +48,7 @@ export class ConversionController {
       properties: {
         file: { type: 'string', format: 'binary', description: 'Image file (max 20MB)' },
         targetFormat: { type: 'string', enum: Object.values(OutputFormat), description: 'Target format' },
+        quality: { type: 'integer', minimum: 1, maximum: 100, description: 'Output quality (JPEG, WebP, AVIF only)' },
       },
     },
   })
@@ -57,7 +58,7 @@ export class ConversionController {
     @Body() dto: ConvertImageDto,
     @Res() res: Response,
   ) {
-    const buffer = await this.conversionService.convert(file, dto.targetFormat);
+    const buffer = await this.conversionService.convert(file, dto.targetFormat, dto.quality);
 
     res.set({
       'Content-Type': `image/${dto.targetFormat}`,

@@ -7,9 +7,12 @@ export class ConversionService {
   async convert(
     file: Express.Multer.File,
     targetFormat: OutputFormat,
+    quality?: number,
   ): Promise<Buffer> {
     try {
-      return await sharp(file.buffer).toFormat(targetFormat).toBuffer();
+      return await sharp(file.buffer)
+        .toFormat(targetFormat, quality ? { quality } : undefined)
+        .toBuffer();
     } catch {
       throw new BadRequestException('Failed to convert image');
     }
