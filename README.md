@@ -4,9 +4,9 @@ REST API for converting images between formats, built with NestJS and Sharp.
 
 ## Supported Formats
 
-| Input                          | Output          |
-| ------------------------------ | --------------- |
-| JPEG, PNG, WebP, GIF, TIFF, BMP | JPEG, PNG, WebP |
+| Input                                    | Output                    |
+| ---------------------------------------- | ------------------------- |
+| JPEG, PNG, WebP, GIF, TIFF, BMP, AVIF, SVG | JPEG, PNG, WebP, AVIF, TIFF |
 
 Max file size: 20MB
 
@@ -31,14 +31,23 @@ Converts an image to the specified format.
 
 - Content-Type: `multipart/form-data`
 - `file` — image file
-- `targetFormat` — `jpeg`, `png`, or `webp`
+- `targetFormat` — `jpeg`, `png`, `webp`, `avif`, or `tiff`
+- `quality` (optional) — `1-100`, only for JPEG, WebP, AVIF
 
-Example:
+Examples:
 ```bash
+# Basic conversion
 curl -X POST http://localhost:3000/convert \
   -F "file=@image.png" \
   -F "targetFormat=webp" \
   --output converted.webp
+
+# With quality
+curl -X POST http://localhost:3000/convert \
+  -F "file=@photo.jpg" \
+  -F "targetFormat=avif" \
+  -F "quality=80" \
+  --output compressed.avif
 ```
 
 ## Tech Stack
