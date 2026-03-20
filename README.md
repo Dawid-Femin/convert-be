@@ -25,6 +25,19 @@ API documentation available at `http://localhost:3000/api` (Swagger UI).
 
 Returns supported input/output formats.
 
+### `POST /metadata`
+
+Returns image metadata (format, dimensions, size, etc.).
+
+- Content-Type: `multipart/form-data`
+- `file` — image file
+
+Example:
+```bash
+curl -X POST http://localhost:3000/metadata \
+  -F "file=@photo.jpg"
+```
+
 ### `POST /convert`
 
 Converts an image to the specified format.
