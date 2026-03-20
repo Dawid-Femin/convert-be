@@ -17,4 +17,21 @@ export class ConversionService {
       throw new BadRequestException('Failed to convert image');
     }
   }
+
+  async getMetadata(file: Express.Multer.File) {
+    try {
+      const metadata = await sharp(file.buffer).metadata();
+      return {
+        format: metadata.format,
+        width: metadata.width,
+        height: metadata.height,
+        channels: metadata.channels,
+        hasAlpha: metadata.hasAlpha,
+        size: file.size,
+        density: metadata.density,
+      };
+    } catch {
+      throw new BadRequestException('Failed to read image metadata');
+    }
+  }
 }

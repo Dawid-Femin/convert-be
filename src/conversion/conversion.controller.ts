@@ -67,4 +67,24 @@ export class ConversionController {
 
     res.send(buffer);
   }
+
+  @Post('metadata')
+  @HttpCode(200)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Get image metadata' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: { type: 'string', format: 'binary', description: 'Image file (max 20MB)' },
+      },
+    },
+  })
+  async getMetadata(
+    @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
+  ) {
+    return this.conversionService.getMetadata(file);
+  }
 }
