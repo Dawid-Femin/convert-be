@@ -23,8 +23,13 @@ export class VideoService {
       if (options.targetFormat === VideoOutputFormat.GIF) {
         command = command.outputOptions(['-vf', 'fps=10,scale=480:-1:flags=lanczos']);
       } else {
-        const codec = options.targetFormat === VideoOutputFormat.WEBM ? 'libvpx-vp9' : 'libx264';
-        command = command.videoCodec(codec);
+        const codecMap: Partial<Record<VideoOutputFormat, string>> = {
+          [VideoOutputFormat.WEBM]: 'libvpx-vp9',
+          [VideoOutputFormat.MKV]: 'libx264',
+          [VideoOutputFormat.FLV]: 'libx264',
+          [VideoOutputFormat.TS]: 'libx264',
+        };
+        command = command.videoCodec(codecMap[options.targetFormat] || 'libx264');
 
         if (options.quality !== undefined) {
           command = command.outputOptions([`-crf`, `${options.quality}`]);
