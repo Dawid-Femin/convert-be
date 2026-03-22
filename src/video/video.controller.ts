@@ -19,7 +19,7 @@ import { Response } from 'express';
 import { diskStorage } from 'multer';
 import * as fs from 'fs';
 import * as path from 'path';
-import { v4 as uuid } from 'uuid';
+import { randomUUID } from 'crypto';
 import { VideoValidationPipe } from './pipes/video-validation.pipe';
 import { ConvertVideoDto } from './dto/convert-video.dto';
 import { VideoInputFormat, VideoOutputFormat, VIDEO_MIME_TYPES } from './enums/video-format.enum';
@@ -50,7 +50,7 @@ export class VideoController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: path.join(process.cwd(), 'tmp', 'video'),
-        filename: (_req, file, cb) => cb(null, `${uuid()}-input${path.extname(file.originalname)}`),
+        filename: (_req, file, cb) => cb(null, `${randomUUID()}-input${path.extname(file.originalname)}`),
       }),
     }),
   )
@@ -72,7 +72,7 @@ export class VideoController {
     @UploadedFile(new VideoValidationPipe()) file: Express.Multer.File,
     @Body() dto: ConvertVideoDto,
   ) {
-    const outputPath = this.storageService.getOutputPath(uuid(), dto.targetFormat);
+    const outputPath = this.storageService.getOutputPath(randomUUID(), dto.targetFormat);
 
     const job = await this.videoQueue.add('convert', {
       inputPath: file.path,
@@ -92,7 +92,7 @@ export class VideoController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: path.join(process.cwd(), 'tmp', 'video'),
-        filename: (_req, file, cb) => cb(null, `${uuid()}-meta${path.extname(file.originalname)}`),
+        filename: (_req, file, cb) => cb(null, `${randomUUID()}-meta${path.extname(file.originalname)}`),
       }),
     }),
   )
