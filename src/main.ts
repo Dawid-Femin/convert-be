@@ -5,18 +5,19 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   const config = new DocumentBuilder()
-    .setTitle('Image Converter API')
-    .setDescription('API for converting images between formats')
-    .setVersion('1.0')
+    .setTitle('Media Converter API')
+    .setDescription('API for converting images and videos between formats')
+    .setVersion('2.0')
     .build();
 
   SwaggerModule.setup('api', app, () =>
     SwaggerModule.createDocument(app, config),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();
