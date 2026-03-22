@@ -1,7 +1,13 @@
 import { Module } from '@nestjs/common';
+import { BullModule } from '@nestjs/bullmq';
 import { ConversionModule } from './conversion/conversion.module';
+import { VideoModule } from './video/video.module';
 
 @Module({
-  imports: [ConversionModule],
+  imports: [
+    BullModule.forRoot({ connection: { host: 'localhost', port: 6379 } }),
+    ConversionModule,
+    VideoModule,
+  ],
 })
 export class AppModule {}
