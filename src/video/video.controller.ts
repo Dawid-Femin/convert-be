@@ -22,7 +22,6 @@ import * as path from 'path';
 import { randomUUID } from 'crypto';
 import { VideoValidationPipe } from './pipes/video-validation.pipe';
 import { ConvertVideoDto } from './dto/convert-video.dto';
-import { ExtractAudioDto, AudioExtractFormat } from './dto/extract-audio.dto';
 import { VideoInputFormat, VideoOutputFormat, VIDEO_MIME_TYPES } from './enums/video-format.enum';
 import { StorageService } from './storage/storage.service';
 import { VideoService } from './video.service';
@@ -135,47 +134,6 @@ export class VideoController {
     } finally {
       this.storageService.removeFile(file.path);
     }
-  }
-
-  @Post('extract-audio')
-  @HttpCode(202)
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: path.join(process.cwd(), 'tmp', 'video'),
-        filename: (_req, file, cb) => cb(null, `${randomUUID()}-input${path.extname(file.originalname)}`),
-      }),
-    }),
-  )
-  @ApiOperation({ summary: 'Extract audio track from video' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['file', 'format'],
-      properties: {
-        file: { type: 'string', format: 'binary', description: 'Video file (max 500MB)' },
-        format: { type: 'string', enum: Object.values(AudioExtractFormat) },
-        bitrate: { type: 'integer', minimum: 32, maximum: 512, description: 'Audio bitrate in kbps' },
-      },
-    },
-  })
-  async extractAudio(
-    @UploadedFile(new VideoValidationPipe()) file: Express.Multer.File,
-    @Body() dto: ExtractAudioDto,
-  ) {
-    const outputPath = this.storageService.getOutputPath(randomUUID(), dto.format);
-
-    const job = await this.videoQueue.add('extract-audio', {
-      inputPath: file.path,
-      outputPath,
-      format: dto.format,
-      bitrate: dto.bitrate,
-      targetFormat: dto.format,
-      originalName: file.originalname,
-    });
-
-    return { jobId: job.id, status: 'pending' };
   }
 
   @Get('jobs/:id')

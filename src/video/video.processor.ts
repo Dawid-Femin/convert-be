@@ -2,6 +2,7 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { VideoService } from './video.service';
 import { StorageService } from './storage/storage.service';
+import { AUDIO_OUTPUT_FORMATS } from './enums/video-format.enum';
 
 export const VIDEO_QUEUE = 'video-conversion';
 
@@ -15,15 +16,16 @@ export class VideoProcessor extends WorkerHost {
   }
 
   async process(job: Job): Promise<void> {
-    const { inputPath, outputPath } = job.data;
+    const { inputPath, outputPath, targetFormat, quality, resolution, startTime, endTime, bitrate } = job.data;
+    const isAudio = AUDIO_OUTPUT_FORMATS.map(f => f.toString()).includes(targetFormat);
 
     try {
-      if (job.name === 'extract-audio') {
+      if (isAudio) {
         await this.videoService.extractAudio({
           inputPath,
           outputPath,
-          format: job.data.format,
-          bitrate: job.data.bitrate,
+          format: targetFormat,
+          bitrate,
           onProgress: async (percent) => {
             await job.updateProgress(percent);
           },
@@ -32,11 +34,11 @@ export class VideoProcessor extends WorkerHost {
         await this.videoService.convert({
           inputPath,
           outputPath,
-          targetFormat: job.data.targetFormat,
-          quality: job.data.quality,
-          resolution: job.data.resolution,
-          startTime: job.data.startTime,
-          endTime: job.data.endTime,
+          targetFormat,
+          quality,
+          resolution,
+          startTime,
+          endTime,
           onProgress: async (percent) => {
             await job.updateProgress(percent);
           },

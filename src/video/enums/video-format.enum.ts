@@ -22,7 +22,21 @@ export enum VideoOutputFormat {
   FLV = 'flv',
   TS = 'ts',
   GIF = 'gif',
+  // Audio extraction
+  MP3 = 'mp3',
+  WAV = 'wav',
+  FLAC = 'flac',
+  AAC = 'aac',
+  OGG_AUDIO = 'ogg',
 }
+
+export const AUDIO_OUTPUT_FORMATS = [
+  VideoOutputFormat.MP3,
+  VideoOutputFormat.WAV,
+  VideoOutputFormat.FLAC,
+  VideoOutputFormat.AAC,
+  VideoOutputFormat.OGG_AUDIO,
+];
 
 export const VIDEO_MIME_TYPES: Record<string, VideoInputFormat> = {
   'video/mp4': VideoInputFormat.MP4,
