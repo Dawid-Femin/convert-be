@@ -17,15 +17,15 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
-import { ConversionService } from './conversion.service';
+import { ImageService } from './image.service';
 import { ConvertImageDto } from './dto/convert-image.dto';
 import { InputFormat, OutputFormat } from './enums/image-format.enum';
 import { FileValidationPipe } from './pipes/file-validation.pipe';
 
 @ApiTags('Image Conversion')
 @Controller()
-export class ConversionController {
-  constructor(private readonly conversionService: ConversionService) {}
+export class ImageController {
+  constructor(private readonly imageService: ImageService) {}
 
   @Get('formats')
   @ApiOperation({ summary: 'Get supported image formats' })
@@ -58,7 +58,7 @@ export class ConversionController {
     @Body() dto: ConvertImageDto,
     @Res() res: Response,
   ) {
-    const buffer = await this.conversionService.convert(file, dto.targetFormat, dto.quality);
+    const buffer = await this.imageService.convert(file, dto.targetFormat, dto.quality);
 
     res.set({
       'Content-Type': `image/${dto.targetFormat}`,
@@ -85,6 +85,6 @@ export class ConversionController {
   async getMetadata(
     @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
   ) {
-    return this.conversionService.getMetadata(file);
+    return this.imageService.getMetadata(file);
   }
 }

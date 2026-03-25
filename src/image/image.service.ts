@@ -3,7 +3,7 @@ import * as sharp from 'sharp';
 import { OutputFormat } from './enums/image-format.enum';
 
 @Injectable()
-export class ConversionService {
+export class ImageService {
   async convert(
     file: Express.Multer.File,
     targetFormat: OutputFormat,
