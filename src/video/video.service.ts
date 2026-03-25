@@ -11,6 +11,16 @@ export interface ConvertOptions {
   targetFormat: VideoOutputFormat;
   quality?: number;
   resolution?: string;
+  startTime?: string;
+  endTime?: string;
+  onProgress?: (percent: number) => void;
+}
+
+export interface ExtractAudioOptions {
+  inputPath: string;
+  outputPath: string;
+  format: string;
+  bitrate?: number;
   onProgress?: (percent: number) => void;
 }
 
@@ -19,6 +29,13 @@ export class VideoService {
   convert(options: ConvertOptions): Promise<void> {
     return new Promise((resolve, reject) => {
       let command = ffmpeg(options.inputPath);
+
+      if (options.startTime) {
+        command = command.setStartTime(options.startTime);
+      }
+      if (options.endTime) {
+        command = command.outputOptions(['-to', options.endTime]);
+      }
 
       if (options.targetFormat === VideoOutputFormat.GIF) {
         command = command.outputOptions(['-vf', 'fps=10,scale=480:-1:flags=lanczos']);
@@ -38,6 +55,35 @@ export class VideoService {
 
       if (options.resolution) {
         command = command.size(options.resolution);
+      }
+
+      command
+        .output(options.outputPath)
+        .on('progress', (progress) => {
+          options.onProgress?.(Math.round(progress.percent || 0));
+        })
+        .on('end', () => resolve())
+        .on('error', (err) => reject(err))
+        .run();
+    });
+  }
+
+  extractAudio(options: ExtractAudioOptions): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let command = ffmpeg(options.inputPath).noVideo();
+
+      const codecMap: Record<string, string> = {
+        mp3: 'libmp3lame',
+        aac: 'aac',
+        ogg: 'libvorbis',
+        flac: 'flac',
+        wav: 'pcm_s16le',
+      };
+
+      command = command.audioCodec(codecMap[options.format] || 'copy');
+
+      if (options.bitrate) {
+        command = command.audioBitrate(`${options.bitrate}k`);
       }
 
       command

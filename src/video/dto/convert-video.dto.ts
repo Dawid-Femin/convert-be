@@ -33,4 +33,18 @@ export class ConvertVideoDto {
   })
   @IsOptional()
   resolution?: string;
+
+  @ApiPropertyOptional({
+    description: 'Trim start time (e.g. 00:00:10 or 10)',
+    example: '00:00:10',
+  })
+  @IsOptional()
+  startTime?: string;
+
+  @ApiPropertyOptional({
+    description: 'Trim end time (e.g. 00:01:30 or 90)',
+    example: '00:01:30',
+  })
+  @IsOptional()
+  endTime?: string;
 }

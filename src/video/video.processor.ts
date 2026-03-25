@@ -15,25 +15,37 @@ export class VideoProcessor extends WorkerHost {
   }
 
   async process(job: Job): Promise<void> {
-    const { inputPath, outputPath, targetFormat, quality, resolution } = job.data;
+    const { inputPath, outputPath } = job.data;
 
     try {
-      await this.videoService.convert({
-        inputPath,
-        outputPath,
-        targetFormat,
-        quality,
-        resolution,
-        onProgress: async (percent) => {
-          await job.updateProgress(percent);
-        },
-      });
+      if (job.name === 'extract-audio') {
+        await this.videoService.extractAudio({
+          inputPath,
+          outputPath,
+          format: job.data.format,
+          bitrate: job.data.bitrate,
+          onProgress: async (percent) => {
+            await job.updateProgress(percent);
+          },
+        });
+      } else {
+        await this.videoService.convert({
+          inputPath,
+          outputPath,
+          targetFormat: job.data.targetFormat,
+          quality: job.data.quality,
+          resolution: job.data.resolution,
+          startTime: job.data.startTime,
+          endTime: job.data.endTime,
+          onProgress: async (percent) => {
+            await job.updateProgress(percent);
+          },
+        });
+      }
     } catch (error) {
-      // Cleanup output file on failure
       this.storageService.removeFile(outputPath);
       throw error;
     } finally {
-      // Always cleanup input file
       this.storageService.removeFile(inputPath);
     }
   }
