@@ -19,6 +19,7 @@ import {
 import { Response } from 'express';
 import { ImageService } from './image.service';
 import { ConvertImageDto } from './dto/convert-image.dto';
+import { CompressImageDto } from './dto/compress-image.dto';
 import { InputFormat, OutputFormat } from './enums/image-format.enum';
 import { FileValidationPipe } from './pipes/file-validation.pipe';
 
@@ -86,5 +87,37 @@ export class ImageController {
     @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
   ) {
     return this.imageService.getMetadata(file);
+  }
+
+  @Post('compress')
+  @HttpCode(200)
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Compress an image without changing format' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['file'],
+      properties: {
+        file: { type: 'string', format: 'binary', description: 'Image file (max 20MB)' },
+        quality: { type: 'integer', minimum: 1, maximum: 100, description: 'Output quality (JPEG, WebP, AVIF)' },
+        palette: { type: 'boolean', description: 'Reduce PNG to 8-bit palette' },
+      },
+    },
+  })
+  @ApiOkResponse({ description: 'Compressed image file', content: { 'image/*': {} } })
+  async compress(
+    @UploadedFile(new FileValidationPipe()) file: Express.Multer.File,
+    @Body() dto: CompressImageDto,
+    @Res() res: Response,
+  ) {
+    const { buffer, format } = await this.imageService.compress(file, dto.quality, dto.palette);
+
+    res.set({
+      'Content-Type': `image/${format}`,
+      'Content-Disposition': `attachment; filename="compressed.${format}"`,
+    });
+
+    res.send(buffer);
   }
 }
